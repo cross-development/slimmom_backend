@@ -80,6 +80,22 @@ async function validateUserToken(req, res, next) {
 	}
 }
 
+async function validateProductQuery(req, res, next) {
+	const createQueryRules = Joi.object({
+		search: Joi.string().required(),
+	});
+
+	const validatedRegister = createQueryRules.validate(req.query);
+
+	if (validatedRegister.error) {
+		const message = validatedRegister.error.details[0].message;
+
+		return res.status(400).json({ message });
+	}
+
+	next();
+}
+
 //The middleware validate id
 function validateId(req, res, next) {
 	const { id } = req.params;
@@ -91,9 +107,18 @@ function validateId(req, res, next) {
 	next();
 }
 
+function checkDailyRate(req, res, next) {
+	if (!req.user.userData.dailyRate) {
+		return res.status(403).send({ message: 'Please, count your daily rate first' });
+	}
+	next();
+}
+
 module.exports = {
 	validateSignUpUser,
 	validateSignInUser,
 	validateUserToken,
 	validateId,
+	validateProductQuery,
+	checkDailyRate,
 };

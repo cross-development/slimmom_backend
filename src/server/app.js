@@ -9,6 +9,7 @@ require('dotenv').config();
 //Router
 const authRouter = require('../api/auth/auth.router');
 const userRouter = require('../api/users/user.router');
+const productRouter = require('../api/product/product.router');
 //Handle logs
 const accessLogStream = require('../utils/accessLogStream');
 
@@ -34,12 +35,13 @@ class Server {
 		this.server.use(helmet());
 		this.server.use(express.json());
 		this.server.use(morgan('combined', { stream: accessLogStream }));
-		this.server.use(cors({ origin: '*' }));
+		this.server.use(cors({ origin: process.env.ALLOWED_ORIGIN }));
 	}
 
 	initRouter() {
 		this.server.use('/api/auth', authRouter);
 		this.server.use('/api/users', userRouter);
+		this.server.use('/api/product', productRouter);
 	}
 
 	async initDatabase() {
