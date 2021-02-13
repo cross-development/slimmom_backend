@@ -3,7 +3,7 @@ const {
 	Types: { ObjectId },
 } = require('mongoose');
 //Models
-const userModel = require('../api/users/user.model');
+const userModel = require('../api/user/user.model');
 //Validate
 const Joi = require('joi');
 //Configs
@@ -107,10 +107,14 @@ function validateId(req, res, next) {
 	next();
 }
 
+//The middleware validate user daily rate
 function checkDailyRate(req, res, next) {
-	if (!req.user.userData.dailyRate) {
+	const { userData } = req.user;
+
+	if (!userData.dailyRate) {
 		return res.status(403).send({ message: 'Please, count your daily rate first' });
 	}
+
 	next();
 }
 
