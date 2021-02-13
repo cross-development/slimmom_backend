@@ -8,7 +8,7 @@ const helmet = require('helmet');
 require('dotenv').config();
 //Router
 const authRouter = require('../api/auth/auth.router');
-const userRouter = require('../api/users/user.router');
+const userRouter = require('../api/user/user.router');
 const productRouter = require('../api/product/product.router');
 //Handle logs
 const accessLogStream = require('../utils/accessLogStream');
