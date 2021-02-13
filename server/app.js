@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 //Middleware
 const cors = require('cors');
 const morgan = require('morgan');
+const helmet = require('helmet');
 require('dotenv').config();
 //Router
 const authRouter = require('../api/auth/auth.router');
@@ -30,9 +31,10 @@ class Server {
 	}
 
 	initMiddleware() {
+		this.server.use(helmet());
 		this.server.use(express.json());
 		this.server.use(morgan('combined', { stream: accessLogStream }));
-		this.server.use(cors({ origin: `${process.env.CORS_URL}` }));
+		this.server.use(cors({ origin: '*' }));
 	}
 
 	initRouter() {
