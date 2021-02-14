@@ -10,6 +10,7 @@ require('dotenv').config();
 const authRouter = require('../api/auth/auth.router');
 const userRouter = require('../api/user/user.router');
 const productRouter = require('../api/product/product.router');
+const dailyRateRouter = require('../api/daily-rate/daily-rate.router');
 //Handle logs
 const accessLogStream = require('../utils/accessLogStream');
 
@@ -42,6 +43,7 @@ class Server {
 		this.server.use('/api/auth', authRouter);
 		this.server.use('/api/users', userRouter);
 		this.server.use('/api/product', productRouter);
+		this.server.use('/api/daily-rate', dailyRateRouter);
 	}
 
 	async initDatabase() {
