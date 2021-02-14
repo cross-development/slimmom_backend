@@ -18,6 +18,16 @@ const {
 	usernameLengthMax,
 } = configs.users;
 
+const {
+	weightMin,
+	weightMax,
+	heightMin,
+	heightMax,
+	ageMin,
+	ageMax,
+	bloodType: { one, two, three, four },
+} = configs.dailyRate;
+
 //The middleware validate to register user
 function validateSignUpUser(req, res, next) {
 	const createRegisterRules = Joi.object({
@@ -80,15 +90,16 @@ async function validateUserToken(req, res, next) {
 	}
 }
 
+// The middleware validate search query
 async function validateProductQuery(req, res, next) {
 	const createQueryRules = Joi.object({
 		search: Joi.string().required(),
 	});
 
-	const validatedRegister = createQueryRules.validate(req.query);
+	const validatedQuery = createQueryRules.validate(req.query);
 
-	if (validatedRegister.error) {
-		const message = validatedRegister.error.details[0].message;
+	if (validatedQuery.error) {
+		const message = validatedQuery.error.details[0].message;
 
 		return res.status(400).json({ message });
 	}
@@ -96,12 +107,33 @@ async function validateProductQuery(req, res, next) {
 	next();
 }
 
-//The middleware validate id
-function validateId(req, res, next) {
-	const { id } = req.params;
+//The middleware validate daily rate credentials
+function validateDailyRate(req, res, next) {
+	const createDailyRateRules = Joi.object({
+		weight: Joi.number().min(weightMin).max(weightMax).required(),
+		height: Joi.number().min(heightMin).max(heightMax).required(),
+		age: Joi.number().min(ageMin).max(ageMax).required(),
+		desiredWeight: Joi.number().min(weightMin).max(weightMax).required(),
+		bloodType: Joi.number().valid(one, two, three, four).required(),
+	});
 
-	if (!ObjectId.isValid(id)) {
-		return res.status(400).send({ message: 'invalid id' });
+	const validatedDailyRate = createDailyRateRules.validate(req.body);
+
+	if (validatedDailyRate.error) {
+		const message = validatedDailyRate.error.details[0].message;
+
+		return res.status(400).json({ message });
+	}
+
+	next();
+}
+
+//The middleware validate userId
+function validateId(req, res, next) {
+	const { userId } = req.params;
+
+	if (!ObjectId.isValid(userId)) {
+		return res.status(400).send({ message: 'invalid userId' });
 	}
 
 	next();
@@ -124,5 +156,6 @@ module.exports = {
 	validateUserToken,
 	validateId,
 	validateProductQuery,
+	validateDailyRate,
 	checkDailyRate,
 };
