@@ -139,12 +139,92 @@ function validateId(req, res, next) {
 	next();
 }
 
-//The middleware validate user daily rate
+//The middleware checks selected daily rate
 function checkDailyRate(req, res, next) {
 	const { userData } = req.user;
 
 	if (!userData.dailyRate) {
 		return res.status(403).send({ message: 'Please, count your daily rate first' });
+	}
+
+	next();
+}
+
+//The middleware validate add product to user summary
+function validateAddProduct(req, res, next) {
+	const addProductRules = Joi.object({
+		date: Joi.string()
+			.custom((value, helpers) => {
+				const dateRegex = /^\s*(3[01]|[12][0-9]|0?[1-9])\.(1[012]|0?[1-9])\.((?:19|20)\d{2})\s*$/;
+				const isDateValid = dateRegex.test(value);
+
+				return !isDateValid
+					? helpers.message({ message: "Invalid 'date'. It should be dd.mm.yyyy string format" })
+					: value;
+			})
+			.required(),
+		productId: Joi.string()
+			.custom((value, helpers) => {
+				return !ObjectId.isValid(value) ? helpers.message({ message: 'Invalid productId' }) : value;
+			})
+			.required(),
+		weight: Joi.number().required(),
+	});
+
+	const validatedAddProduct = addProductRules.validate(req.body);
+
+	if (validatedAddProduct.error) {
+		const message = validatedAddProduct.error.details[0].message;
+
+		return res.status(400).json({ message });
+	}
+
+	next();
+}
+
+//The middleware validate delete product from user summary
+function validateDeleteProduct(req, res, next) {
+	const deleteProductRules = Joi.object({
+		eatenProductId: Joi.string().required(),
+		dayId: Joi.string()
+			.custom((value, helpers) => {
+				return !ObjectId.isValid(value) ? helpers.message({ message: 'Invalid dayId' }) : value;
+			})
+			.required(),
+	});
+
+	const validatedDeleteProduct = deleteProductRules.validate(req.body);
+
+	if (validatedDeleteProduct.error) {
+		const message = validatedDeleteProduct.error.details[0].message;
+
+		return res.status(400).json({ message });
+	}
+
+	next();
+}
+
+//The middleware validate get day info from user summary
+function validateDayInfo(req, res, next) {
+	const getDayInfoRules = Joi.object({
+		date: Joi.string()
+			.custom((value, helpers) => {
+				const dateRegex = /^\s*(3[01]|[12][0-9]|0?[1-9])\.(1[012]|0?[1-9])\.((?:19|20)\d{2})\s*$/;
+				const isDateValid = dateRegex.test(value);
+
+				return !isDateValid
+					? helpers.message({ message: "Invalid 'date'. It should be dd.mm.yyyy string format" })
+					: value;
+			})
+			.required(),
+	});
+
+	const validatedDayInfo = getDayInfoRules.validate(req.body);
+
+	if (validatedDayInfo.error) {
+		const message = validatedDayInfo.error.details[0].message;
+
+		return res.status(400).json({ message });
 	}
 
 	next();
@@ -158,4 +238,7 @@ module.exports = {
 	validateProductQuery,
 	validateDailyRate,
 	checkDailyRate,
+	validateAddProduct,
+	validateDeleteProduct,
+	validateDayInfo,
 };

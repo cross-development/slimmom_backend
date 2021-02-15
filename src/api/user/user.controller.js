@@ -1,6 +1,7 @@
 //Models
 const userModel = require('./user.model');
 const summaryModel = require('../summary/summary.model');
+const dayModel = require('../day/day.model');
 
 /**
  * Gets user credential from request and returns the current user
@@ -10,6 +11,7 @@ async function getCurrentUser(req, res, next) {
 	try {
 		const currentUser = await userModel.findOne({ _id: req.user._id }).populate({
 			path: 'days',
+			model: dayModel,
 			populate: [{ path: 'daySummary', model: summaryModel }],
 		});
 
