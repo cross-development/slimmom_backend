@@ -7,11 +7,114 @@ const productModel = require('../product/product.model');
 const summaryModel = require('../summary/summary.model');
 
 async function addProduct(req, res, next) {
-    try {
-        
-    } catch (error) {
-        next(error)
-    }
+	try {
+		const {
+			body: { date, productId, weight },
+			user: { _id: userId, userData },
+		} = req;
+
+		const product = await productModel.findById(productId);
+
+		if (!product) {
+			return res.status(404).json({ message: 'Product not found' });
+		}
+
+		const user = await userModel.findById(userId).populate('days');
+
+		const existingDay = user.days.find(day => day.date === date);
+
+		const kcalCoefficient = product.calories / product.weight;
+		const kcalConsumed = kcalCoefficient * weight;
+
+		const eatenProduct = {
+			id: await crypto.randomBytes(16).toString('hex'),
+			title: product.title.ru,
+			kcal: kcalConsumed,
+			weight,
+		};
+
+		if (existingDay) {
+			existingDay.eatenProducts.push(eatenProduct);
+			await existingDay.save();
+
+			const daySummary = await summaryModel.findOne({ $and: [{ date }, { userId }] });
+
+			daySummary.kcalLeft -= kcalConsumed;
+			daySummary.kcalConsumed += kcalConsumed;
+			daySummary.percentsOfDailyRate = (daySummary.kcalConsumed * 100) / userData.dailyRate;
+
+			if (daySummary.kcalLeft < 0) {
+				daySummary.kcalLeft = 0;
+				daySummary.percentsOfDailyRate = 100;
+			}
+
+			await daySummary.save();
+
+			return res.status(201).send({
+				eatenProduct,
+				daySummary: {
+					id: daySummary._id,
+					date: daySummary.date,
+					userId: daySummary.userId,
+					kcalLeft: daySummary.kcalLeft,
+					dailyRate: daySummary.dailyRate,
+					kcalConsumed: daySummary.kcalConsumed,
+					percentsOfDailyRate: daySummary.percentsOfDailyRate,
+				},
+				day: {
+					id: existingDay._id,
+					date: existingDay.date,
+					daySummary: existingDay.daySummary,
+					eatenProducts: existingDay.eatenProducts,
+				},
+			});
+		}
+
+		const newSummary = await SummaryModel.create({
+			userId,
+			date,
+			kcalConsumed,
+			dailyRate: userData.dailyRate,
+			kcalLeft: userData.dailyRate - kcalConsumed,
+			percentsOfDailyRate: (kcalConsumed * 100) / userData.dailyRate,
+		});
+
+		if (newSummary.kcalLeft < 0) {
+			newSummary.kcalLeft = 0;
+			newSummary.percentsOfDailyRate = 100;
+			await newSummary.save();
+		}
+
+		const newDay = await DayModel.create({
+			eatenProducts: [eatenProduct],
+			daySummary: newSummary._id,
+			date,
+		});
+
+		user.days.push(newDay._id);
+		await user.save();
+
+		return res.status(201).send({
+			eatenProduct,
+			newDay: {
+				id: newDay._id,
+				date: newDay.date,
+				daySummary: newDay.daySummary,
+				eatenProducts: newDay.eatenProducts,
+			},
+			newSummary: {
+				id: newSummary._id,
+				date: newSummary.date,
+				userId: newSummary.userId,
+				kcalLeft: newSummary.kcalLeft,
+				dailyRate: newSummary.dailyRate,
+				kcalConsumed: newSummary.kcalConsumed,
+				percentsOfDailyRate: newSummary.percentsOfDailyRate,
+			},
+		});
+	} catch (error) {
+		next(error);
+	}
 }
 
 async function deleteProduct(req, res, next) {
