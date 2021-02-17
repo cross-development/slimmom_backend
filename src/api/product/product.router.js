@@ -10,6 +10,7 @@ const { findProducts } = productController;
 
 const productRouter = Router();
 
+// @ GET /api/product
 productRouter.get('/', validateUserToken, checkDailyRate, validateProductQuery, findProducts);
 
 module.exports = productRouter;
