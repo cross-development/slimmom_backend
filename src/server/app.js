@@ -21,7 +21,6 @@ const accessLogStream = require('../utils/accessLogStream');
 class Server {
 	constructor() {
 		this.server = null;
-		this.port = process.env.PORT || 3001;
 	}
 
 	async start() {
@@ -67,8 +66,10 @@ class Server {
 	}
 
 	startListening() {
-		this.server.listen(this.port, () => {
-			console.log('Server started listening on port', this.port);
+		const port = process.env.PORT || 3001;
+
+		this.server.listen(port, () => {
+			console.log('Server started listening on port', port);
 		});
 	}
 }
