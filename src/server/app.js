@@ -12,6 +12,9 @@ const userRouter = require('../api/user/user.router');
 const dayRouter = require('../api/day/day.router');
 const productRouter = require('../api/product/product.router');
 const dailyRateRouter = require('../api/daily-rate/daily-rate.router');
+//Docs
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('../../swagger.json');
 //Handle logs
 const accessLogStream = require('../utils/accessLogStream');
 
@@ -46,6 +49,7 @@ class Server {
 		this.server.use('/api/day', dayRouter);
 		this.server.use('/api/product', productRouter);
 		this.server.use('/api/daily-rate', dailyRateRouter);
+		this.server.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 	}
 
 	async initDatabase() {
