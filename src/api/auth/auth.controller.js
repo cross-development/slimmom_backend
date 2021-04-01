@@ -39,7 +39,13 @@ async function singUpUser(req, res, next) {
 			days: [],
 		});
 
-		return res.status(201).json({ user: { userId: createdUser._id, username, email } });
+		const token = jwt.sign({ userId: createdUser._id }, process.env.JWT_SECRET_KEY, {
+			expiresIn: process.env.JWT_ACCESS_EXPIRE_TIME,
+		});
+
+		await userModel.findByIdAndUpdate(createdUser._id, { token }, { new: true });
+
+		return res.status(201).json({ user: { userId: createdUser._id, username, email }, token });
 	} catch (error) {
 		next(error);
 	}
@@ -89,20 +95,20 @@ async function signInUser(req, res, next) {
 
 		const response = {
 			token,
-			todaySummary: {
-				date: todaySummary.date,
-				kcalLeft: todaySummary.kcalLeft,
-				kcalConsumed: todaySummary.kcalConsumed,
-				dailyRate: todaySummary.dailyRate,
-				percentsOfDailyRate: todaySummary.percentsOfDailyRate,
-				userId: todaySummary.userId,
-				id: todaySummary._id,
-			},
 			user: {
 				userId: user._id,
 				email: user.email,
 				username: user.username,
 				userData: user.userData,
+			},
+			todaySummary: {
+				id: todaySummary._id,
+				userId: todaySummary.userId,
+				date: todaySummary.date,
+				kcalLeft: todaySummary.kcalLeft,
+				kcalConsumed: todaySummary.kcalConsumed,
+				dailyRate: todaySummary.dailyRate,
+				percentsOfDailyRate: todaySummary.percentsOfDailyRate,
 			},
 		};
 
