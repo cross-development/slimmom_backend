@@ -132,4 +132,44 @@ async function signOutUser(req, res, next) {
 	}
 }
 
-module.exports = { singUpUser, signInUser, signOutUser };
+//Validate user token
+async function validateToken(req, res, next) {
+	try {
+		const authorizationHeader = req.get('Authorization') || '';
+		const token = authorizationHeader.replace('Bearer ', '');
+
+		try {
+			const userId = await jwt.verify(token, process.env.JWT_SECRET_KEY).userId;
+			const user = await userModel.findById(userId);
+
+			if (!user) {
+				return res.status(404).json({ message: 'Invalid user' });
+			}
+
+			if (user.token !== token) {
+				return res.status(401).json({ message: 'Bearer auth failed' });
+			}
+
+			req.user = user;
+
+			next();
+		} catch (err) {
+			return res.status(400).json({ message: 'No token provided' });
+		}
+	} catch (err) {
+		next(err);
+	}
+}
+
+//The middleware checks selected daily rate
+function checkDailyRate(req, res, next) {
+	const { userData } = req.user;
+
+	if (!userData.dailyRate) {
+		return res.status(403).send({ message: 'Please, count your daily rate first' });
+	}
+
+	next();
+}
+
+module.exports = { singUpUser, signInUser, signOutUser, validateToken, checkDailyRate };

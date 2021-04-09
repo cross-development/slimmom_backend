@@ -1,9 +1,9 @@
 module.exports = {
 	users: {
-		usernameLengthMin: 3,
-		usernameLengthMax: 20,
-		userPassLengthMin: 6,
-		userPassLengthMax: 20,
+		usernameMin: 3,
+		usernameMax: 20,
+		userPassMin: 6,
+		userPassMax: 20,
 	},
 
 	dailyRate: {
