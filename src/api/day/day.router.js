@@ -1,14 +1,15 @@
 //Core
 const { Router } = require('express');
 //Controllers
-const { validateToken, checkDailyRate } = require('../auth/auth.controller');
-const { addProduct, deleteProduct, getDayInfo } = require('./day.controller');
+const { validateToken } = require('../auth/auth.controller');
+const dayController = require('./day.controller');
 //Helpers
 const validate = require('../../helpers/validate');
 const tryCatchHandler = require('../../helpers/tryCatchHandler');
 const validationSchemas = require('../../helpers/validationSchemas');
 
 const { addProductSchema, deleteProductSchema, getDayInfoSchema } = validationSchemas;
+const { addProduct, deleteProduct, getDayInfo, checkDailyRate } = dayController;
 
 const dayRouter = Router();
 

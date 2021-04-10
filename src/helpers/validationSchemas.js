@@ -28,11 +28,29 @@ const signInSchema = Joi.object({
  */
 
 const getDayInfoSchema = Joi.object({
-	date: Joi.date().required(),
+	date: Joi.string()
+		.custom((value, helpers) => {
+			const dateRegex = /^\s*(3[01]|[12][0-9]|0?[1-9])\.(1[012]|0?[1-9])\.((?:19|20)\d{2})\s*$/;
+			const isDateValid = dateRegex.test(value);
+
+			return !isDateValid
+				? helpers.message({ message: "Invalid 'date'. It should be dd.mm.yyyy string format" })
+				: value;
+		})
+		.required(),
 });
 
 const addProductSchema = Joi.object({
-	date: Joi.date().required(),
+	date: Joi.string()
+		.custom((value, helpers) => {
+			const dateRegex = /^\s*(3[01]|[12][0-9]|0?[1-9])\.(1[012]|0?[1-9])\.((?:19|20)\d{2})\s*$/;
+			const isDateValid = dateRegex.test(value);
+
+			return !isDateValid
+				? helpers.message({ message: "Invalid 'date'. It should be dd.mm.yyyy string format" })
+				: value;
+		})
+		.required(),
 	productId: Joi.string()
 		.custom((value, helpers) => {
 			return !ObjectId.isValid(value) ? helpers.message({ message: 'Invalid productId' }) : value;

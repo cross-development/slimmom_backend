@@ -1,8 +1,8 @@
 //Core
 const { Router } = require('express');
 //Controllers
-const { calculateDailyRate } = require('./daily-rate.controller');
 const { validateToken } = require('../auth/auth.controller');
+const { calculateDailyRate } = require('./daily-rate.controller');
 //Helpers
 const validate = require('../../helpers/validate');
 const tryCatchHandler = require('../../helpers/tryCatchHandler');
