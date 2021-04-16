@@ -17,11 +17,12 @@ async function findProducts(req, res) {
 		.find({
 			'title.ru': { $regex: search, $options: 'i' },
 		})
+		.select('-__v')
 		.lean();
 
-	const allowedProducts = foundProducts.filter(
-		({ groupBloodNotAllowed }) => groupBloodNotAllowed[userData.bloodType] === false,
-	);
+	const allowedProducts = foundProducts
+		.filter(({ groupBloodNotAllowed }) => groupBloodNotAllowed[userData.bloodType] === false)
+		.map(({ _id, ...product }) => ({ id: _id, ...product }));
 
 	if (!allowedProducts.length) {
 		return res.status(400).json({ message: 'No allowed products found for this query' });

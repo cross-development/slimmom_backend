@@ -8,7 +8,7 @@ const {
 const daySchema = new Schema({
 	date: String,
 	daySummary: { type: ObjectId, ref: 'Summary' },
-	eatenProduct: [{ _id: false, title: String, weight: Number, kcal: Number, id: String }],
+	eatenProducts: [{ _id: false, title: String, weight: Number, kcal: Number, id: String }],
 });
 
 module.exports = model('Day', daySchema);
