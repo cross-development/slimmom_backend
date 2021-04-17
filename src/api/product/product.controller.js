@@ -25,7 +25,7 @@ async function findProducts(req, res) {
 		.map(({ _id, ...product }) => ({ id: _id, ...product }));
 
 	if (!allowedProducts.length) {
-		return res.status(400).json({ message: 'No allowed products found for this query' });
+		return res.status(400).send({ message: 'No allowed products found for this query' });
 	}
 
 	return res.status(200).json(allowedProducts);

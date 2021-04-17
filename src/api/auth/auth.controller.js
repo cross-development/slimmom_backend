@@ -36,13 +36,11 @@ async function singUpUser(req, res) {
 		days: [],
 	});
 
-	const token = jwt.sign({ userId: createdUser._id }, process.env.JWT_SECRET_KEY, {
-		expiresIn: process.env.JWT_ACCESS_EXPIRE_TIME,
+	return res.status(201).json({
+		userId: createdUser._id,
+		username,
+		email,
 	});
-
-	await userModel.findByIdAndUpdate(createdUser._id, { token }, { new: true });
-
-	return res.status(201).json({ user: { userId: createdUser._id, username, email }, token });
 }
 
 /**
@@ -55,7 +53,7 @@ async function signInUser(req, res) {
 	const user = await userModel.findOne({ email });
 
 	if (!user) {
-		return res.status(404).json({ message: 'User with such email not found' });
+		return res.status(404).send({ message: 'User with such email not found' });
 	}
 
 	const isUserPasswordCorrect = await bcrypt.compare(password, user.password);
@@ -95,8 +93,8 @@ async function signInUser(req, res) {
 			userData: user.userData,
 		},
 		todaySummary: {
-			id: todaySummary._id,
-			userId: todaySummary.userId,
+			// id: todaySummary._id,
+			// userId: todaySummary.userId,
 			date: todaySummary.date,
 			kcalLeft: todaySummary.kcalLeft,
 			kcalConsumed: todaySummary.kcalConsumed,
@@ -114,8 +112,9 @@ async function signInUser(req, res) {
  * */
 async function signOutUser(req, res) {
 	await userModel.findByIdAndUpdate(req.user._id, { token: '' });
+	req.user = null;
 
-	return res.status(204).send();
+	return res.status(204).end();
 }
 
 //Validate user token

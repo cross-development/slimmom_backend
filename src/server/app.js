@@ -26,6 +26,7 @@ class Server {
 		this.initMiddleware();
 		this.initRouter();
 		await this.initDatabase();
+		this.initErrorHandling();
 		this.startListening();
 	}
 
@@ -60,6 +61,18 @@ class Server {
 		} catch (error) {
 			process.exit(1);
 		}
+	}
+
+	initErrorHandling() {
+		this.server.use((err, req, res, next) => {
+			let status = 500;
+
+			if (err.response) {
+				status = err.response.status;
+			}
+
+			return res.status(status).send(err.message);
+		});
 	}
 
 	startListening() {

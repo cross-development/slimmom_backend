@@ -32,16 +32,11 @@ async function calculateDailyRate(req, res) {
 	const user = await userModel.findById(userId);
 
 	if (!user) {
-		return res.status(404).json({ message: 'Invalid user' });
+		return res.status(404).send({ message: 'Invalid user' });
 	}
 
-	await userModel.findByIdAndUpdate(
-		userId,
-		{
-			userData: { height, weight, age, desiredWeight, bloodType, dailyRate, notAllowedProducts },
-		},
-		{ new: true },
-	);
+	user.userData = { age, weight, height, bloodType, dailyRate, desiredWeight, notAllowedProducts };
+	await user.save();
 
 	let summaries = await summaryModel.find({ userId });
 
@@ -53,7 +48,6 @@ async function calculateDailyRate(req, res) {
 				summary.dailyRate = dailyRate;
 				summary.kcalLeft -= diff;
 				summary.percentsOfDailyRate = (summary.kcalConsumed * 100) / dailyRate;
-				summary.save();
 			}
 
 			if (summary.dailyRate < dailyRate) {
@@ -62,8 +56,9 @@ async function calculateDailyRate(req, res) {
 				summary.dailyRate = dailyRate;
 				summary.kcalLeft += diff;
 				summary.percentsOfDailyRate = (summary.kcalConsumed * 100) / dailyRate;
-				summary.save();
 			}
+
+			summary.save();
 		});
 	} else {
 		summaries = [];
