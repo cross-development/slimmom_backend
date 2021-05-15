@@ -74,7 +74,14 @@ async function signInUser(req, res) {
 	if (!todaySummary) {
 		return res.status(200).json({
 			token,
-			todaySummary: {},
+			todaySummary: {
+				eatenProducts: [],
+				date: currentDate,
+				kcalLeft: user.userData.dailyRate,
+				kcalConsumed: 0,
+				dailyRate: user.userData.dailyRate,
+				percentsOfDailyRate: 0,
+			},
 			user: {
 				userId: user._id,
 				email: user.email,
@@ -93,8 +100,6 @@ async function signInUser(req, res) {
 			userData: user.userData,
 		},
 		todaySummary: {
-			// id: todaySummary._id,
-			// userId: todaySummary.userId,
 			date: todaySummary.date,
 			kcalLeft: todaySummary.kcalLeft,
 			kcalConsumed: todaySummary.kcalConsumed,

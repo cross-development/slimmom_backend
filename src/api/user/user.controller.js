@@ -16,16 +16,16 @@ async function getCurrentUser(req, res) {
 	});
 
 	const { username, email, _id, userData, days } = currentUser;
-	const currentDay = new Date().toLocaleDateString('us-US');
+	const currentDate = new Date().toLocaleDateString('us-US');
 
-	const existingDay = days.find(({ date }) => date === currentDay);
+	const existingDay = days.find(({ date }) => date === currentDate);
 
 	if (!existingDay) {
 		return res.status(200).json({
 			user: { userId: _id, username, email, userData },
 			daySummary: {
 				eatenProducts: [],
-				date: currentDay,
+				date: currentDate,
 				kcalLeft: userData.dailyRate,
 				kcalConsumed: 0,
 				dailyRate: userData.dailyRate,

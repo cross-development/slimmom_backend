@@ -55,13 +55,10 @@ async function addProduct(req, res) {
 			day: {
 				id: existingDay._id,
 				date: existingDay.date,
-				// daySummary: existingDay.daySummary,
 				eatenProducts: existingDay.eatenProducts,
 			},
 			daySummary: {
-				// id: daySummary._id,
 				date: daySummary.date,
-				// userId: daySummary.userId,
 				kcalLeft: daySummary.kcalLeft,
 				dailyRate: daySummary.dailyRate,
 				kcalConsumed: daySummary.kcalConsumed,
@@ -99,13 +96,10 @@ async function addProduct(req, res) {
 		day: {
 			id: newDay._id,
 			date: newDay.date,
-			// daySummary: newDay.daySummary,
 			eatenProducts: newDay.eatenProducts,
 		},
 		daySummary: {
-			// id: newSummary._id,
 			date: newSummary.date,
-			// userId: newSummary.userId,
 			kcalLeft: newSummary.kcalLeft,
 			dailyRate: newSummary.dailyRate,
 			kcalConsumed: newSummary.kcalConsumed,
@@ -181,8 +175,6 @@ async function getDayInfo(req, res) {
 			kcalConsumed: daySummary.kcalConsumed,
 			dailyRate: daySummary.dailyRate,
 			percentsOfDailyRate: daySummary.percentsOfDailyRate,
-			// userId: daySummary.userId,
-			// id: daySummary._id,
 		},
 	});
 }
